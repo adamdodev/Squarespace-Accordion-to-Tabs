@@ -1,0 +1,91 @@
+<style>
+    .accordion-items-container {
+        display: grid !important;
+        /* columns are set dynamically by JS, but fallback for 3 items: */
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0;
+    }
+
+    .accordion-item {
+        display: contents; /* removes li box; children join the grid directly */
+    }
+
+    .accordion-item__title-wrapper {
+        grid-row: 1;
+        cursor: pointer;
+        text-align: left;
+        padding: 0 !important;
+        border-bottom: 1px solid var(--paragraphMediumColor);
+        transition: none !important;
+    }
+
+    .accordion-item__title-wrapper.tab--active {
+        border: 1px solid  var(--paragraphMediumColor);
+        border-radius: 0.5rem 0.5rem 0 0;
+        border-bottom: none;
+    }
+
+    .accordion-item__dropdown {
+        grid-row: 2;
+        grid-column: 1 / -1; /* span all tab columns */
+        display: none;
+        padding: 2rem;
+    }
+
+    .accordion-item__dropdown.tab--active {
+        display: block !important;
+    }
+    
+    .accordion-item__dropdown a {
+        color: var(--paragraphMediumColor) !important;
+        text-decoration: underline;
+    }
+
+    .accordion-item__title {
+        padding: 2rem !important;
+    }
+
+    .accordion-item__click-target {
+        padding: 0 !important;
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const accordion = document.querySelector('.accordion-items-container');
+  if (!accordion) return;
+
+  const items = [...accordion.querySelectorAll('.accordion-item')];
+
+  // Fix grid column count to match item count
+  accordion.style.gridTemplateColumns = `repeat(${items.length}, 1fr)`;
+
+  items.forEach((item, i) => {
+    const header = item.querySelector('.accordion-item__title-wrapper');
+    const headerClick = item.querySelector('.accordion-item__title-wrapper .accordion-item__title');
+    const dropdown = item.querySelector('.accordion-item__dropdown');
+
+    // Explicitly place each title in its grid column
+    header.style.gridColumn = i + 1;
+
+    headerClick.addEventListener('click', function (e) {
+      e.stopPropagation(); // prevent Squarespace's own handler
+      console.log('Header clicked:', headerClick.textContent.trim());
+
+      items.forEach(it => {
+        it.querySelector('.accordion-item__dropdown').style.display = 'none';
+        it.querySelector('.accordion-item__title-wrapper').classList.remove('tab--active');
+      //   it.querySelector('.accordion-item__dropdown').classList.remove('tab--active');
+      });
+
+      dropdown.style.display = 'block';
+      header.classList.add('tab--active');
+    //   dropdown.classList.add('tab--active');
+    });
+  });
+
+  // Activate first tab by default
+  items[0].querySelector('.accordion-item__title-wrapper').classList.add('tab--active');
+  items[0].querySelector('.accordion-item__dropdown').style.display = 'block';
+});
+</script>
